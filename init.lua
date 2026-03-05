@@ -28,4 +28,8 @@ require("lazy").setup({
 	require("plugins.indent-blankline"),
 	require("plugins.misc"),
 	require("plugins.neogit"),
+	require("plugins.comment"),
+	require("plugins.toggleterm"),
+	require("plugins.inline"),
+	-- require("plugins.nightfox"),
 })
