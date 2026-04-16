@@ -4,6 +4,7 @@ vim.o.clipboard = 'unnamedplus' -- Sync clipboard between OS and Neovim. (defaul
 vim.o.wrap = false -- Display lines as one long line (default: true)
 vim.o.linebreak = true -- Companion to wrap, don't split words (default: false)
 vim.o.mouse = 'a' -- Enable mouse mode (default: '')
+vim.o.autoread = true -- Reload files changed outside of Neovim when possible
 vim.o.autoindent = true -- Copy indent from current line when starting new one (default: true)
 vim.o.ignorecase = true -- Case-insensitive searching UNLESS \C or capital in search (default: false)
 vim.o.smartcase = true -- Smart case (default: false)
@@ -41,3 +42,22 @@ vim.opt.shortmess:append 'c' -- Don't give |ins-completion-menu| messages (defau
 vim.opt.iskeyword:append '-' -- Hyphenated words recognized by searches (default: does not include '-')
 vim.opt.formatoptions:remove { 'c', 'r', 'o' } -- Don't insert the current comment leader automatically for auto-wrapping comments using 'textwidth', hitting <Enter> in insert mode, or hitting 'o' or 'O' in normal mode. (default: 'croql')
 vim.opt.runtimepath:remove '/usr/share/vim/vimfiles' -- Separate Vim plugins from Neovim in case Vim still in use (default: includes this path if Vim is installed)
+vim.o.exrc = true -- Allow project-local .nvim.lua/.nvimrc overrides
+
+local checktime_group = vim.api.nvim_create_augroup('ChecktimeHooks', { clear = true })
+
+vim.api.nvim_create_autocmd({ 'FocusGained', 'TermClose', 'TermLeave', 'BufEnter' }, {
+	group = checktime_group,
+	callback = function()
+		if vim.fn.mode() ~= 'c' then
+			vim.cmd('checktime')
+		end
+	end,
+})
+
+vim.api.nvim_create_autocmd('FileChangedShellPost', {
+	group = checktime_group,
+	callback = function()
+		vim.notify('File reloaded from disk', vim.log.levels.INFO, { title = 'nvim' })
+	end,
+})

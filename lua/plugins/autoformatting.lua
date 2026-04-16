@@ -8,6 +8,7 @@ return {
     local null_ls = require 'null-ls'
     local formatting = null_ls.builtins.formatting -- to setup formatters
     local diagnostics = null_ls.builtins.diagnostics -- to setup linters
+    vim.g.autoformat = true
 
     -- Formatters & linters for mason to install
     require('mason-null-ls').setup {
@@ -35,6 +36,19 @@ return {
     }
 
     local augroup = vim.api.nvim_create_augroup('LspFormatting', {})
+
+    vim.api.nvim_create_user_command('FormatToggle', function(command_opts)
+      if command_opts.bang then
+        vim.b.autoformat = not vim.b.autoformat
+        local state = vim.b.autoformat ~= false
+        vim.notify('Buffer format on save ' .. (state and 'enabled' or 'disabled'), vim.log.levels.INFO, { title = 'nvim' })
+        return
+      end
+
+      vim.g.autoformat = not vim.g.autoformat
+      vim.notify('Global format on save ' .. (vim.g.autoformat and 'enabled' or 'disabled'), vim.log.levels.INFO, { title = 'nvim' })
+    end, { bang = true })
+
     null_ls.setup {
       -- debug = true, -- Enable debug mode. Inspect logs with :NullLsLog.
       sources = sources,
@@ -46,6 +60,9 @@ return {
             group = augroup,
             buffer = bufnr,
             callback = function()
+              if vim.g.autoformat == false or vim.b[bufnr].autoformat == false then
+                return
+              end
               vim.lsp.buf.format { async = false }
             end,
           })

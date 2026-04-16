@@ -11,6 +11,25 @@ return {
 	{
 		-- Hints keybinds
 		"folke/which-key.nvim",
+		event = "VeryLazy",
+		config = function()
+			local wk = require("which-key")
+
+			wk.setup()
+			wk.add({
+				{ "<leader>b", group = "Buffers" },
+				{ "<leader>c", group = "Code" },
+				{ "<leader>g", group = "Glow" },
+				{ "<leader>m", group = "Harpoon" },
+				{ "<leader>n", group = "Notes / Neo-tree" },
+				{ "<leader>q", group = "Sessions / Diagnostics" },
+				{ "<leader>s", group = "Search" },
+				{ "<leader>t", group = "Terminal / Treesitter" },
+				{ "<leader>u", group = "Toggles" },
+				{ "<leader>x", group = "Diagnostics / Trouble" },
+				{ "<leader>y", group = "Yank path" },
+			})
+		end,
 	},
 	{
 		-- Autoclose parentheses, brackets, quotes, etc.

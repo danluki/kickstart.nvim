@@ -134,6 +134,7 @@ return {
 			ruff = {},
 			gopls = {},
 			rust_analyzer = {},
+			zls = {},
 			pylsp = {
 				settings = {
 					pylsp = {

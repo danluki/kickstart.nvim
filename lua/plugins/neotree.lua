@@ -27,6 +27,15 @@ return {
     },
   },
   config = function()
+    local function neotree_reveal_current()
+      local path = vim.api.nvim_buf_get_name(0)
+      if path ~= "" then
+        vim.cmd("Neotree reveal position=left")
+      else
+        vim.cmd("Neotree filesystem toggle position=left dir=" .. vim.fn.fnameescape(vim.fn.getcwd()))
+      end
+    end
+
     require('neo-tree').setup {
       close_if_last_window = false, -- Close Neo-tree if it is the last window left in the tab
       popup_border_style = 'rounded',
@@ -302,8 +311,31 @@ return {
       },
     }
 
-    vim.cmd [[nnoremap \ :Neotree reveal<cr>]]
-    vim.keymap.set('n', '<leader>e', ':Neotree toggle position=left<CR>', { noremap = true, silent = true }) -- focus file explorer
+    vim.keymap.set('n', '\\', neotree_reveal_current, { noremap = true, silent = true })
+    vim.keymap.set('n', '<leader>e', neotree_reveal_current, { noremap = true, silent = true }) -- focus file explorer
     vim.keymap.set('n', '<leader>ngs', ':Neotree float git_status<CR>', { noremap = true, silent = true }) -- open git status window
+
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "neo-tree",
+      callback = function()
+        vim.wo.winfixwidth = true
+      end,
+    })
+
+    vim.api.nvim_create_autocmd("VimEnter", {
+      callback = function()
+        local is_empty = vim.fn.argc() == 0
+          and vim.api.nvim_buf_get_name(0) == ""
+          and vim.bo.buftype == ""
+
+        if not is_empty then
+          return
+        end
+
+        vim.schedule(function()
+          vim.cmd("Neotree filesystem reveal left")
+        end)
+      end,
+    })
   end,
 }
